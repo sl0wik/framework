@@ -1877,7 +1877,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where($field ?? $this->getRouteKeyName(), $value)->first();
+        $field ??= $this->getRouteKeyName();
+
+        return $this->where($field, $this->hasCast($field) ? $this->castAttribute($field, $value) : $value)->first();
     }
 
     /**
@@ -1889,7 +1891,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveSoftDeletableRouteBinding($value, $field = null)
     {
-        return $this->where($field ?? $this->getRouteKeyName(), $value)->withTrashed()->first();
+        $field ??= $this->getRouteKeyName();
+
+        return $this->where($field, $this->hasCast($field) ? $this->castAttribute($field, $value) : $values)->withTrashed()->first();
     }
 
     /**
@@ -1931,6 +1935,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $relationship = $this->{Str::plural(Str::camel($childType))}();
 
         $field = $field ?: $relationship->getRelated()->getRouteKeyName();
+
+        if ($relationship->getRelated()->hasCast($field)) {
+            $value = $relationship->getRelated()->castAttribute($field, $value);
+        }
 
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {
