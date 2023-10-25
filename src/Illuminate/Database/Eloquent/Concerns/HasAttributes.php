@@ -455,6 +455,23 @@ trait HasAttributes
     }
 
     /**
+     * Check if the model has the specified attributes with the given values.
+     *
+     * @param  array  $attributes
+     * @return bool
+     */
+    public function hasAttributes(array $attributes)
+    {
+        foreach ($attributes as $attribute => $value) {
+            if ($this->getAttribute($attribute) !== $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Either throw a missing attribute exception or return null depending on Eloquent's configuration.
      *
      * @param  string  $key
